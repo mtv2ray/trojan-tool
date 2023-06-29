@@ -3,6 +3,7 @@ TROJAN_GO_VERSION_CHECK="https://api.github.com/repos/p4gefau1t/trojan-go/releas
 MAINASSET="https://raw.githubusercontent.com/mtv2ray/trojan-tool/main"
 DOMAIN_NAME="tvpn1.y7srvahawg.top"
 TMPTROJAN_GO="/tmp/trojan_go"
+NAME=trojan_go
 
 #######color code########
 RED="31m"
@@ -118,6 +119,15 @@ acme(){
     cp /root/.acme.sh/$acmeServer/$acmeServer.key $acmeKeyPath
 }
 
+installTrojanGO(){
+    VERSION=$(curl -H 'Cache-Control: no-cache' -s "$TROJAN_GO_VERSION_CHECK" | grep 'tag_name' | cut -d\" -f4)
+    TARBALL="trojan-go-linux-amd64.zip"
+    DOWNLOADURL="https://github.com/p4gefau1t/trojan-go/releases/download/v$VERSION/$TARBALL"
+    echo Downloading $NAME $VERSION...
+    curl -LO --progress-bar "$DOWNLOADURL" || wget -q --show-progress "$DOWNLOADURL"
+    echo Unpacking $NAME $VERSION...
+}
+
 main(){
     checkSys
     if [ $? != 0 ];then
@@ -127,8 +137,10 @@ main(){
     getLoaclIp
     echo "公网ip: $loaclip"
     getTrojanServerJson
-    # pythonweb
+    
     acme
+    # pythonweb
+    installTrojanGO
 }
 
 main
