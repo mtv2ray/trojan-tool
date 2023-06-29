@@ -2,7 +2,7 @@
 CLEARTMP=0 # 0 清空tmp 1 不清空
 TROJAN_GO_VERSION_CHECK="https://api.github.com/repos/p4gefau1t/trojan-go/releases"
 MAINASSET="https://raw.githubusercontent.com/mtv2ray/trojan-tool/main"
-DOMAIN_NAME="tvpn1.y7srvahawg.top"
+DOMAIN_NAME="tvpn1.y7srvahawg.top" #  这个自己更改
 TMPTROJAN_GO="/tmp/trojan-go"
 NAME=trojan-go
 SERVICE_NAME="trojan-go@.service"
