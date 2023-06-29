@@ -2,6 +2,7 @@
 TROJAN_GO_VERSION_CHECK="https://api.github.com/repos/p4gefau1t/trojan-go/releases"
 MAINASSET="https://raw.githubusercontent.com/mtv2ray/trojan-tool/main"
 DOMAIN_NAME="tvpn1.y7srvahawg.top"
+TMPTROJAN_GO="/tmp/trojan_go"
 
 #######color code########
 RED="31m"
@@ -47,33 +48,46 @@ checkSys(){
     if [[ -z `command -v jq` ]];then
         ${PACKAGE_MANAGER} install jq -y
     fi
+    if [ ! -d "$TMPTROJAN_GO" ];then
+        echo "生成 $TMPTROJAN_GO 缓存目录"
+        mkdir ${TMPTROJAN_GO}
+    fi
 }
 
 getLoaclIp(){
-    loaclip=$(ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/(.*)/, "\\1", "g", $2)}')
+    echo "获取公网ip"
+    # loaclip=$(ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/(.*)/, "\\1", "g", $2)}')
+    loaclip=$(curl ifconfig.me)
 }
 
-# getTrojanServerJson(){
-#     curl -o "$MAINASSET/tvpn1.y7srvahawg.top"
-# }
+getTrojanServerJson(){
+    curl -o "$TMPTROJAN_GO/server.json" "$MAINASSET/tvpn1.y7srvahawg.top.json"
+}
 
 acme(){
-    curl -L https://get.acme.sh -o acme.sh
-    echo "下载acme.sh脚本"
+    acmeCertPath=$(cat "$TMPTROJAN_GO/server.json" | jq -r '.ssl.cert')
+    acmeKeyPath=$(cat "$TMPTROJAN_GO/server.json" | jq -r '.ssl.key')
+    acmeServer=$(cat "$TMPTROJAN_GO/server.json" | jq -r '.ssl.sni')
+    if [ ! -f $acmeCertPath ] || [ ! -f $acmeKeyPath];then
+        echo "需要生成新证书"
+    fi
+    # curl -L https://get.acme.sh -o acme.sh
+    # echo "下载acme.sh脚本"
 
-    rm acme.sh
-    echo "为了使acme.sh脚本总是最新的用完就删"
+    # rm acme.sh
+    # echo "为了使acme.sh脚本总是最新的用完就删"
 }
 
 main(){
     checkSys
     if [ $? != 0 ];then
-        echo "hello"
+        colorEcho ${RED} "失败"
     fi
+    echo "获取公网ip"
     getLoaclIp
-    echo "hello $loaclip"
-    # getTrojanServerJson
-    # acme
+    echo "公网ip: $loaclip"
+    getTrojanServerJson
+    acme
     # cat n.json | jq -r '.metadata.namespace'
 }
 
