@@ -134,7 +134,7 @@ acme(){
         echo "需要生成新证书"
         echo "执行acme.sh"
         if [ ! -f "/root/.acme.sh/acme.sh" ];then
-            source <(curl -sL "https://get.acme.sh")
+            curl https://get.acme.sh | sh -s email=yuuhaha@gmail.com
         else
             /root/.acme.sh/acme.sh --upgrade
         fi 
