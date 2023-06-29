@@ -1,5 +1,5 @@
 #!/bin/bash
-CLEARTMP=1 # 0 清空tmp 1 不清空
+CLEARTMP=0 # 0 清空tmp 1 不清空
 TROJAN_GO_VERSION_CHECK="https://api.github.com/repos/p4gefau1t/trojan-go/releases"
 MAINASSET="https://raw.githubusercontent.com/mtv2ray/trojan-tool/main"
 DOMAIN_NAME="tvpn1.y7srvahawg.top"
@@ -75,7 +75,7 @@ checkSys(){
         ${PACKAGE_MANAGER} install python -y
         PYTHON_MANAGER='python'
     fi
-    if [ CLEARTMP == 0 ];then
+    if [ CLEARTMP != 1 ];then
         echo "清空 $TMPTROJAN_GO 缓存目录"
         rm -rf ${TMPTROJAN_GO}
         rm /tmp/$TARBALL
@@ -120,6 +120,10 @@ acme(){
     acmeCertPath=$(cat "$TMPTROJAN_GO/server.json" | jq -r '.ssl.cert')
     acmeKeyPath=$(cat "$TMPTROJAN_GO/server.json" | jq -r '.ssl.key')
     acmeServer=$(cat "$TMPTROJAN_GO/server.json" | jq -r '.ssl.sni')
+    if [ CLEARTMP != 1 ];then
+        rm $acmeCertPath
+        rm $acmeKeyPath
+    fi
     if [ ! -f $acmeCertPath ] || [ ! -f $acmeKeyPath ];then
         acmeCertPathDir=$(dirname "$acmeCertPath") 
         acmeKeyPathDir=$(dirname "$acmeKeyPath")
@@ -133,7 +137,7 @@ acme(){
         fi
         echo "需要生成新证书"
         echo "执行acme.sh"
-        if [ ! -f "/root/.acme.sh/acme.sh" ];then
+        if [ ! -f "/root/.acme.sh/acme.sh" ] || [ CLEARTMP != 1 ];then
             curl https://get.acme.sh | sh -s email=yuuhaha@gmail.com
         else
             /root/.acme.sh/acme.sh --upgrade
@@ -141,7 +145,7 @@ acme(){
         
         /root/.acme.sh/acme.sh --issue -d $acmeServer --debug --standalone --keylength ec-256 --force 
         # /root/.acme.sh/acme.sh --issue -d $acmeServer --debug --standalone --keylength ec-256 --force --server $loaclip
-        cp /root/.acme.sh/${acmeServer}_ecc/$acmeServer.cer $acmeCertPath
+        cp /root/.acme.sh/${acmeServer}_ecc/fullchain.cer $acmeCertPath
         cp /root/.acme.sh/${acmeServer}_ecc/$acmeServer.key $acmeKeyPath
     fi
 }
@@ -173,6 +177,7 @@ installTrojanGO(){
     systemctl enable trojan-go@server.service
     systemctl start trojan-go@server.service
     systemctl status trojan-go@server.service
+    # systemctl stop trojan-go@server.service
 }
 
 main(){
