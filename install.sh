@@ -71,7 +71,7 @@ main(){
         echo "hello"
     fi
     getLoaclIp
-    getTrojanServerJson
+    # getTrojanServerJson
     # acme
     # cat n.json | jq -r '.metadata.namespace'
 }
