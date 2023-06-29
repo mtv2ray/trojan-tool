@@ -108,12 +108,12 @@ pythonweb(){
         chmod +x "$TMPTROJAN_GO/server.py"
         nohup ${PYTHON_MANAGER} "$TMPTROJAN_GO/server.py" >/var/log/trojan_http.log 2>&1 &
     fi
-    webpids=`lsof -i :443 | awk '{print $1 " " $2}'`
-    if [ "$webpid" == "" ];then
-        curl -o "$TMPTROJAN_GO/serverHttps.py" "$MAINASSET/serverHttps.py"
-        chmod +x "$TMPTROJAN_GO/serverHttps.py"
-        nohup ${PYTHON_MANAGER} "$TMPTROJAN_GO/serverHttps.py" >/var/log/trojan_https.log 2>&1 &
-    fi
+    # webpids=`lsof -i :443 | awk '{print $1 " " $2}'`
+    # if [ "$webpid" == "" ];then
+    #     curl -o "$TMPTROJAN_GO/serverHttps.py" "$MAINASSET/serverHttps.py"
+    #     chmod +x "$TMPTROJAN_GO/serverHttps.py"
+    #     nohup ${PYTHON_MANAGER} "$TMPTROJAN_GO/serverHttps.py" >/var/log/trojan_https.log 2>&1 &
+    # fi
 }
 
 acme(){
