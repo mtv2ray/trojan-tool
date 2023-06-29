@@ -1,5 +1,7 @@
 #!/bin/bash
 TROJAN_GO_VERSION_CHECK="https://api.github.com/repos/p4gefau1t/trojan-go/releases"
+MAINASSET="https://raw.githubusercontent.com/mtv2ray/trojan-tool/main"
+DOMAIN_NAME="tvpn1.y7srvahawg.top"
 
 #######color code########
 RED="31m"
@@ -47,13 +49,20 @@ checkSys(){
     fi
 }
 
+getLoaclIp(){
+    ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {echo gensub(/(.*)\/(.*)/, "\\1", "g", $2)}'
+}
+
+# getTrojanServerJson(){
+#     curl -o "$MAINASSET/tvpn1.y7srvahawg.top"
+# }
+
 acme(){
-    source <(curl -sL https://raw.githubusercontent.com/mtv2ray/trojan-tool/main/install.sh)
     curl -L https://get.acme.sh -o acme.sh
     echo "下载acme.sh脚本"
 
-    # rm acme.sh
-    # echo "为了使acme.sh脚本总是最新的用完就删"
+    rm acme.sh
+    echo "为了使acme.sh脚本总是最新的用完就删"
 }
 
 main(){
@@ -61,7 +70,9 @@ main(){
     if [ $? != 0 ];then
         echo "hello"
     fi
-    acme
+    getLoaclIp
+    getTrojanServerJson
+    # acme
     # cat n.json | jq -r '.metadata.namespace'
 }
 
