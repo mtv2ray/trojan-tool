@@ -50,7 +50,7 @@ checkSys(){
 }
 
 getLoaclIp(){
-    ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {echo gensub(/(.*)\/(.*)/, "\\1", "g", $2)}'
+    loaclip=$(ip addr | awk '/^[0-9]+: / {}; /inet.*global/ {print gensub(/(.*)\/(.*)/, "\\1", "g", $2)}')
 }
 
 # getTrojanServerJson(){
@@ -71,6 +71,7 @@ main(){
         echo "hello"
     fi
     getLoaclIp
+    echo "hello $loaclip"
     # getTrojanServerJson
     # acme
     # cat n.json | jq -r '.metadata.namespace'
