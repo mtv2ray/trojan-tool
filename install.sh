@@ -48,11 +48,12 @@ checkSys(){
 }
 
 acme(){
+    source <(curl -sL https://raw.githubusercontent.com/mtv2ray/trojan-tool/main/install.sh)
     curl -L https://get.acme.sh -o acme.sh
     echo "下载acme.sh脚本"
 
-    rm acme.sh
-    echo "为了使acme.sh脚本总是最新的用完就删"
+    # rm acme.sh
+    # echo "为了使acme.sh脚本总是最新的用完就删"
 }
 
 main(){
