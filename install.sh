@@ -5,6 +5,7 @@ MAINASSET="https://raw.githubusercontent.com/mtv2ray/trojan-tool/main"
 DOMAIN_NAME="tvpn1.y7srvahawg.top"
 TMPTROJAN_GO="/tmp/trojan-go"
 NAME=trojan-go
+SERVICE_NAME="trojan-go@.service"
 
 #######color code########
 RED="31m"
@@ -93,7 +94,7 @@ getLoaclIp(){
 
 getTrojanServerJson(){
     if [ ! -f "$TMPTROJAN_GO/server.json" ];then
-        curl -o "$TMPTROJAN_GO/server.json" "$MAINASSET/tvpn1.y7srvahawg.top.json"
+        curl -o "$TMPTROJAN_GO/server.json" "$MAINASSET/$DOMAIN_NAME.json"
     fi
 }
 
@@ -146,14 +147,21 @@ installTrojanGO(){
     fi
 
     echo Unpacking $NAME $VERSION...
-    unzip /tmp/$TARBALL -d /tmp/$NAME
-    mv /tmp/$NAME/trojan-go /usr/bin
+    unzip -o /tmp/$TARBALL -d /tmp/$NAME
+    echo Unpack Done $NAME $VERSION...
+    mv -f /tmp/$NAME/trojan-go /usr/bin
     if [ ! -d /etc/$NAME ];then
         mkdir /etc/$NAME 
     fi
     cp $TMPTROJAN_GO/server.json /etc/$NAME/server.json
-    cp $TMPTROJAN_GO/geoip.dat /etc/$NAME/geoip.dat
+    cp $TMPTROJAN_GO/geoip.dat /etc/$NAME/geoip.datcd 
     cp $TMPTROJAN_GO/geosite.dat /etc/$NAME/geosite.dat
+    if [ ! -f $TMPTROJAN_GO/$SERVICE_NAME ];then
+        curl -o "$TMPTROJAN_GO/$SERVICE_NAME" "$MAINASSET/$SERVICE_NAME"
+    fi
+    cp $TMPTROJAN_GO/$SERVICE_NAME /etc/systemd/system
+    systemctl daemon-reload
+    systemctl enable trojan-go@server.service
 }
 
 main(){

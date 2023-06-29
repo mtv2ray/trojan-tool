@@ -15,8 +15,8 @@
   "router": {
     "enabled": true,
     "block": ["geoip:private", "domain:baidu.com"],
-    "geoip": "/etc/geoip.dat",
-    "geosite": "/etc/geosite.dat"
+    "geoip": "/etc/trojan-go/geoip.dat",
+    "geosite": "/etc/trojan-go/geosite.dat"
   },
   "log-file":"/var/log/trojan-go.log",
   "log-level":1
