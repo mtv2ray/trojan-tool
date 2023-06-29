@@ -80,6 +80,9 @@ checkSys(){
         rm -rf ${TMPTROJAN_GO}
         rm /tmp/$TARBALL
     fi
+    if [ ! -d /var/log ];then
+        mkdir /var/log
+    fi
     if [ ! -d "$TMPTROJAN_GO" ];then
         echo "生成 $TMPTROJAN_GO 缓存目录"
         mkdir ${TMPTROJAN_GO}
@@ -169,7 +172,7 @@ installTrojanGO(){
     systemctl daemon-reload
     systemctl enable trojan-go@server.service
     systemctl start trojan-go@server.service
-    systemctl tatus trojan-go@server.service
+    systemctl status trojan-go@server.service
 }
 
 main(){
