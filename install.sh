@@ -48,6 +48,16 @@ checkSys(){
     if [[ -z `command -v jq` ]];then
         ${PACKAGE_MANAGER} install jq -y
     fi
+    if [[ -z `command -v python3` ]];then
+        ${PACKAGE_MANAGER} install python3 -y
+        PYTHON_MANAGER = 'python3'
+    elif [[ -z `command -v python2` ]];then
+        ${PACKAGE_MANAGER} install python2 -y
+        PYTHON_MANAGER = 'python2'
+    elif [[ -z `command -v python` ]];then
+        ${PACKAGE_MANAGER} install python -y
+        PYTHON_MANAGER = 'python'
+    fi
     if [ ! -d "$TMPTROJAN_GO" ];then
         echo "生成 $TMPTROJAN_GO 缓存目录"
         mkdir ${TMPTROJAN_GO}
@@ -64,18 +74,25 @@ getTrojanServerJson(){
     curl -o "$TMPTROJAN_GO/server.json" "$MAINASSET/tvpn1.y7srvahawg.top.json"
 }
 
+pythonweb(){
+
+}
+
 acme(){
+    # acme之前需要把80端口打开
     acmeCertPath=$(cat "$TMPTROJAN_GO/server.json" | jq -r '.ssl.cert')
     acmeKeyPath=$(cat "$TMPTROJAN_GO/server.json" | jq -r '.ssl.key')
     acmeServer=$(cat "$TMPTROJAN_GO/server.json" | jq -r '.ssl.sni')
     if [ ! -f $acmeCertPath ] || [ ! -f $acmeKeyPath];then
         echo "需要生成新证书"
+        echo "执行acme.sh"
+        if [ ! -f "/root/.acme.sh/acme.sh" ];then
+            source <(curl -sL "https://get.acme.sh")
+        fi 
+        /root/.acme.sh/acme.sh --upgrade
+        /root/.acme.sh/acme.sh --issue -d $acmeServer --debug --standalone --keylength ec-256 --force --server $loaclip
     fi
-    # curl -L https://get.acme.sh -o acme.sh
-    # echo "下载acme.sh脚本"
-
-    # rm acme.sh
-    # echo "为了使acme.sh脚本总是最新的用完就删"
+    
 }
 
 main(){
@@ -87,6 +104,7 @@ main(){
     getLoaclIp
     echo "公网ip: $loaclip"
     getTrojanServerJson
+    pythonweb
     acme
     # cat n.json | jq -r '.metadata.namespace'
 }
