@@ -27,6 +27,13 @@ colorEcho(){
 checkSys(){
     #检查是否为Root
     [ $(id -u) != "0" ] && { colorEcho ${RED} "Error: You must be root to run this script"; return 0; }
+    #检查443端口是否占用
+    # webpid=`lsof -i :443 | awk '{print $1 " " $2}'`
+    # if [ "$webpid" == "" ];then
+    #     colorEcho ${RED} "Error: port 443 is in use!";
+    #     return 0;
+    # fi
+    
     ARCH=$(uname -m 2> /dev/null)
     if [[ $ARCH != x86_64 && $ARCH != aarch64 ]];then
         colorEcho $YELLOW "not support $ARCH machine".
@@ -48,15 +55,22 @@ checkSys(){
     if [[ -z `command -v jq` ]];then
         ${PACKAGE_MANAGER} install jq -y
     fi
-    if [[ -z `command -v python3` ]];then
+
+    if [[ ! -z `command -v python3` ]];then
+        PYTHON_MANAGER='python3'
+    elif [[ ! -z `command -v python2` ]];then
+        PYTHON_MANAGER='python2'
+    elif [[ ! -z `command -v python` ]];then
+        PYTHON_MANAGER='python'
+    elif [[ -z `command -v python3` ]];then
         ${PACKAGE_MANAGER} install python3 -y
-        PYTHON_MANAGER = 'python3'
+        PYTHON_MANAGER='python3'
     elif [[ -z `command -v python2` ]];then
         ${PACKAGE_MANAGER} install python2 -y
-        PYTHON_MANAGER = 'python2'
+        PYTHON_MANAGER='python2'
     elif [[ -z `command -v python` ]];then
         ${PACKAGE_MANAGER} install python -y
-        PYTHON_MANAGER = 'python'
+        PYTHON_MANAGER='python'
     fi
     if [ ! -d "$TMPTROJAN_GO" ];then
         echo "生成 $TMPTROJAN_GO 缓存目录"
@@ -75,7 +89,12 @@ getTrojanServerJson(){
 }
 
 pythonweb(){
-
+    webpid=`lsof -i :8011 | awk '{print $1 " " $2}'`
+    if [ "$webpid" == "" ];then
+        curl -o "$TMPTROJAN_GO/server.py" "$MAINASSET/server.py"
+        chmod +x "$TMPTROJAN_GO/server.py"
+        ${PYTHON_MANAGER} "$TMPTROJAN_GO/server.py" & echo "hello python"
+    fi
 }
 
 acme(){
@@ -88,11 +107,15 @@ acme(){
         echo "执行acme.sh"
         if [ ! -f "/root/.acme.sh/acme.sh" ];then
             source <(curl -sL "https://get.acme.sh")
+        else
+            /root/.acme.sh/acme.sh --upgrade
         fi 
-        /root/.acme.sh/acme.sh --upgrade
-        /root/.acme.sh/acme.sh --issue -d $acmeServer --debug --standalone --keylength ec-256 --force --server $loaclip
+        
+        /root/.acme.sh/acme.sh --issue -d $acmeServer --debug --standalone --keylength ec-256 --force 
+        # /root/.acme.sh/acme.sh --issue -d $acmeServer --debug --standalone --keylength ec-256 --force --server $loaclip
     fi
-    
+    cp /root/.acme.sh/$acmeServer/$acmeServer.cer $acmeCertPath
+    cp /root/.acme.sh/$acmeServer/$acmeServer.key $acmeKeyPath
 }
 
 main(){
@@ -104,9 +127,8 @@ main(){
     getLoaclIp
     echo "公网ip: $loaclip"
     getTrojanServerJson
-    pythonweb
+    # pythonweb
     acme
-    # cat n.json | jq -r '.metadata.namespace'
 }
 
 main

@@ -8,8 +8,8 @@
         "password"
     ],
     "ssl": {
-        "cert": "tvpn1.y7srvahawg.top.crt",
-        "key": "tvpn1.y7srvahawg.top.key",
+        "cert": "/var/cert/tvpn1.y7srvahawg.top/server.crt",
+        "key": "/var/cert/tvpn1.y7srvahawg.top/key.key",
         "sni": "tvpn1.y7srvahawg.top"
     },
     "router": {
