@@ -147,6 +147,13 @@ installTrojanGO(){
 
     echo Unpacking $NAME $VERSION...
     unzip /tmp/$TARBALL -d /tmp/$NAME
+    mv /tmp/$NAME/trojan-go /usr/bin
+    if [ ! -d /etc/$NAME ];then
+        mkdir /etc/$NAME 
+    fi
+    cp $TMPTROJAN_GO/server.json /etc/$NAME/server.json
+    cp $TMPTROJAN_GO/geoip.dat /etc/$NAME/geoip.dat
+    cp $TMPTROJAN_GO/geosite.dat /etc/$NAME/geosite.dat
 }
 
 main(){
