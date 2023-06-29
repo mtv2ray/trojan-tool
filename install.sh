@@ -89,7 +89,7 @@ getTrojanServerJson(){
 }
 
 pythonweb(){
-    webpid=`lsof -i :8011 | awk '{print $1 " " $2}'`
+    webpid=`lsof -i :80 | awk '{print $1 " " $2}'`
     if [ "$webpid" == "" ];then
         curl -o "$TMPTROJAN_GO/server.py" "$MAINASSET/server.py"
         chmod +x "$TMPTROJAN_GO/server.py"
