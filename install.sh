@@ -61,7 +61,7 @@ main(){
         echo "hello"
     fi
     acme
-    cat n.json | jq -r '.metadata.namespace'
+    # cat n.json | jq -r '.metadata.namespace'
 }
 
 main
