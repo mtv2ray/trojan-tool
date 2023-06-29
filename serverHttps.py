@@ -1,6 +1,7 @@
 import sys
+import json
 # Define the port number
-PORT = 80
+PORT = 443
 if sys.version_info.major == 3:
    from http.server import BaseHTTPRequestHandler, HTTPServer
    import ssl
@@ -15,8 +16,15 @@ if sys.version_info.major == 3:
    if __name__ == '__main__':
       server_address = ('', PORT)
       httpd = HTTPServer(server_address, MyHandler)
-      print('Python3 Server running on port',PORT)
-      httpd.serve_forever()
+      context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+      with open('/etc/trojan-go/server.json') as f:
+         data = json.load(f)
+         context.load_cert_chain(certfile=data['ssl']['cert'], keyfile=data['ssl']['key'])
+         httpd.socket = context.wrap_socket(httpd.socket, server_side=True)
+         print('Python3 Server running on port',PORT)
+         httpd.serve_forever()
+      
+      
 if sys.version_info.major == 2:
    import SimpleHTTPServer
    import SocketServer
