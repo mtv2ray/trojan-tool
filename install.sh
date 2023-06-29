@@ -1,9 +1,10 @@
 #!/bin/bash
+CLEARTMP=1 # 0 清空tmp 1 不清空
 TROJAN_GO_VERSION_CHECK="https://api.github.com/repos/p4gefau1t/trojan-go/releases"
 MAINASSET="https://raw.githubusercontent.com/mtv2ray/trojan-tool/main"
 DOMAIN_NAME="tvpn1.y7srvahawg.top"
-TMPTROJAN_GO="/tmp/trojan_go"
-NAME=trojan_go
+TMPTROJAN_GO="/tmp/trojan-go"
+NAME=trojan-go
 
 #######color code########
 RED="31m"
@@ -73,6 +74,11 @@ checkSys(){
         ${PACKAGE_MANAGER} install python -y
         PYTHON_MANAGER='python'
     fi
+    if [ CLEARTMP == 0 ];then
+        echo "清空 $TMPTROJAN_GO 缓存目录"
+        rm -rf ${TMPTROJAN_GO}
+        rm /tmp/$TARBALL
+    fi
     if [ ! -d "$TMPTROJAN_GO" ];then
         echo "生成 $TMPTROJAN_GO 缓存目录"
         mkdir ${TMPTROJAN_GO}
@@ -86,7 +92,9 @@ getLoaclIp(){
 }
 
 getTrojanServerJson(){
-    curl -o "$TMPTROJAN_GO/server.json" "$MAINASSET/tvpn1.y7srvahawg.top.json"
+    if [ ! -f "$TMPTROJAN_GO/server.json" ];then
+        curl -o "$TMPTROJAN_GO/server.json" "$MAINASSET/tvpn1.y7srvahawg.top.json"
+    fi
 }
 
 pythonweb(){
@@ -99,11 +107,20 @@ pythonweb(){
 }
 
 acme(){
-    # acme之前需要把80端口打开
     acmeCertPath=$(cat "$TMPTROJAN_GO/server.json" | jq -r '.ssl.cert')
     acmeKeyPath=$(cat "$TMPTROJAN_GO/server.json" | jq -r '.ssl.key')
     acmeServer=$(cat "$TMPTROJAN_GO/server.json" | jq -r '.ssl.sni')
-    if [ ! -f $acmeCertPath ] || [ ! -f $acmeKeyPath];then
+    if [ ! -f $acmeCertPath ] || [ ! -f $acmeKeyPath ];then
+        acmeCertPathDir=$(dirname "$acmeCertPath") 
+        acmeKeyPathDir=$(dirname "$acmeKeyPath")
+        if [ ! -f $acmeCertPathDir ];then
+            echo "$acmeCertPathDir"
+            mkdir -p $acmeCertPathDir
+        fi
+         if [ ! -f $acmeKeyPathDir ];then
+            echo "$acmeKeyPathDir"
+            mkdir -p $acmeKeyPathDir
+        fi
         echo "需要生成新证书"
         echo "执行acme.sh"
         if [ ! -f "/root/.acme.sh/acme.sh" ];then
@@ -114,18 +131,22 @@ acme(){
         
         /root/.acme.sh/acme.sh --issue -d $acmeServer --debug --standalone --keylength ec-256 --force 
         # /root/.acme.sh/acme.sh --issue -d $acmeServer --debug --standalone --keylength ec-256 --force --server $loaclip
+        cp /root/.acme.sh/${acmeServer}_ecc/$acmeServer.cer $acmeCertPath
+        cp /root/.acme.sh/${acmeServer}_ecc/$acmeServer.key $acmeKeyPath
     fi
-    cp /root/.acme.sh/$acmeServer/$acmeServer.cer $acmeCertPath
-    cp /root/.acme.sh/$acmeServer/$acmeServer.key $acmeKeyPath
 }
 
 installTrojanGO(){
-    VERSION=$(curl -H 'Cache-Control: no-cache' -s "$TROJAN_GO_VERSION_CHECK" | grep 'tag_name' | cut -d\" -f4)
-    TARBALL="trojan-go-linux-amd64.zip"
-    DOWNLOADURL="https://github.com/p4gefau1t/trojan-go/releases/download/v$VERSION/$TARBALL"
-    echo Downloading $NAME $VERSION...
-    curl -LO --progress-bar "$DOWNLOADURL" || wget -q --show-progress "$DOWNLOADURL"
+    if [ ! -f /tmp/$TARBALL ];then
+        VERSION=$(curl -H 'Cache-Control: no-cache' -s "$TROJAN_GO_VERSION_CHECK" | grep 'tag_name' | cut -d\" -f4 | sed 's/v//g' | head -n 1)
+        TARBALL="trojan-go-linux-amd64.zip"
+        DOWNLOADURL="https://github.com/p4gefau1t/trojan-go/releases/download/v$VERSION/$TARBALL"
+        echo Downloading $NAME $VERSION url $DOWNLOADURL ...
+        wget -q --show-progress "$DOWNLOADURL" -P /tmp/
+    fi
+
     echo Unpacking $NAME $VERSION...
+    unzip /tmp/$TARBALL -d /tmp/$NAME
 }
 
 main(){
@@ -133,9 +154,9 @@ main(){
     if [ $? != 0 ];then
         colorEcho ${RED} "失败"
     fi
-    echo "获取公网ip"
-    getLoaclIp
-    echo "公网ip: $loaclip"
+    # echo "获取公网ip"
+    # getLoaclIp
+    # echo "公网ip: $loaclip"
     getTrojanServerJson
     
     acme
