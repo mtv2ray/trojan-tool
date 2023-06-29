@@ -168,6 +168,8 @@ installTrojanGO(){
     cp $TMPTROJAN_GO/$SERVICE_NAME /etc/systemd/system
     systemctl daemon-reload
     systemctl enable trojan-go@server.service
+    systemctl start trojan-go@server.service
+    systemctl tatus trojan-go@server.service
 }
 
 main(){
