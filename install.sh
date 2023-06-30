@@ -138,13 +138,14 @@ acme(){
         echo "需要生成新证书"
         echo "执行acme.sh"
         if [ ! -f "/root/.acme.sh/acme.sh" ] || [ CLEARTMP != 1 ];then
-            curl https://get.acme.sh | sh -s email=yuuhaha@gmail.com
+            # curl https://get.acme.sh | sh -s email=yuuhaha@gmail.com
+            curl https://get.acme.sh | sh 
         else
             /root/.acme.sh/acme.sh --upgrade
         fi 
         
-        /root/.acme.sh/acme.sh --issue -d $acmeServer --debug --standalone --keylength ec-256 --force 
-        # /root/.acme.sh/acme.sh --issue -d $acmeServer --debug --standalone --keylength ec-256 --force --server $loaclip
+        # /root/.acme.sh/acme.sh --issue -d $acmeServer --debug --standalone --keylength ec-256 --force 
+        /root/.acme.sh/acme.sh --issue -d $acmeServer --debug --standalone --keylength ec-256 --force --server "letsencrypt"
         cp /root/.acme.sh/${acmeServer}_ecc/fullchain.cer $acmeCertPath
         cp /root/.acme.sh/${acmeServer}_ecc/$acmeServer.key $acmeKeyPath
     fi
