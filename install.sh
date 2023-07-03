@@ -101,7 +101,12 @@ getLoaclIp(){
 
 getTrojanServerJson(){
     if [ ! -f "$TMPTROJAN_GO/server.json" ];then
-        curl -o "$TMPTROJAN_GO/server.json" "$MAINASSET/$DOMAIN_NAME.json"
+        if [ "$2" == "sspanel" ];then
+            curl -o "$DOMAIN_NAME.json.doc" "$MAINASSET/sspanel.json"
+            sed "s/{DOMAIN}/$DOMAIN_NAME/g" "$DOMAIN_NAME.json.doc" > "$DOMAIN_NAME.json"
+        else
+            curl -o "$TMPTROJAN_GO/server.json" "$MAINASSET/$DOMAIN_NAME.json"
+        fi
     fi
 }
 
