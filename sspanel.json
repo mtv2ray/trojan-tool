@@ -6,9 +6,9 @@
   "remote_port": 80,
   "password": ["password_admin123"],
   "ssl": {
-    "cert": "/var/cert/tvpn1.y7srvahawg.top/server.crt",
-    "key": "/var/cert/tvpn1.y7srvahawg.top/key.key",
-    "sni": "tvpn1.y7srvahawg.top",
+    "cert": "/var/cert/{DOMAIN}/server.crt",
+    "key": "/var/cert/{DOMAIN}/key.key",
+    "sni": "{DOMAIN}",
     "fallback_addr": "127.0.0.1",
     "fallback_port": 443
   },
