@@ -10,6 +10,7 @@ echo "域名 $DOMAIN_NAME"
 TMPTROJAN_GO="/tmp/trojan-go"
 NAME=trojan-go
 SERVICE_NAME="trojan-go@.service"
+TARBALL="trojan-go-linux-amd64.zip"
 
 #######color code########
 RED="31m"
@@ -163,7 +164,7 @@ acme(){
 installTrojanGO(){
     if [ ! -f /tmp/$TARBALL ];then
         VERSION=$(curl -H 'Cache-Control: no-cache' -s "$TROJAN_GO_VERSION_CHECK" | grep 'tag_name' | cut -d\" -f4 | sed 's/v//g' | head -n 1)
-        TARBALL="trojan-go-linux-amd64.zip"
+        
         DOWNLOADURL="https://github.com/p4gefau1t/trojan-go/releases/download/v$VERSION/$TARBALL"
         echo Downloading $NAME $VERSION url $DOWNLOADURL ...
         wget -q --show-progress "$DOWNLOADURL" -P /tmp/
